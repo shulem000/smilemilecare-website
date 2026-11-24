@@ -53,5 +53,6 @@ jobs:
           [ "$c" = 200 ] && grep -q "SmileMile" /tmp/body
           c=$(curl -s -o /dev/null -w '%{http_code}' "$B/contact.php" || true); echo "contact form (GET is turned away): $c"; [ "$c" = 303 ]
           c=$(curl -s -o /dev/null -w '%{http_code}' "$B/_private/leads.csv" || true); echo "saved messages (must be blocked): $c"; [ "$c" = 403 ] || [ "$c" = 404 ]
-          echo "https: $(curl -s -o /dev/null -w '%{http_code}' https://smilemilecare.com/ || echo none)"
+          c=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' http://smilemilecare.com/ || true); echo "plain http forwards to https: $c"; case "$c" in 301*https://*) ;; *) exit 1;; esac
+          [ "$B" = https://smilemilecare.com ]
           echo "All checks passed."
