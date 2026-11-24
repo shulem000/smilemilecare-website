@@ -1,0 +1,8 @@
+DirectoryIndex index.html
+Options -Indexes
+<FilesMatch "\.(csv|txt|log)$">
+  Require all denied
+</FilesMatch>
+<Files "robots.txt">
+  Require all granted
+</Files>

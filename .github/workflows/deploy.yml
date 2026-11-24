@@ -1,0 +1,57 @@
+name: Upload website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload site/ to the web server (FTPS)
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          if [ -z "$FTP_SERVER" ] || [ -z "$FTP_USERNAME" ] || [ -z "$FTP_PASSWORD" ]; then
+            echo "FTP secrets are not set yet - skipping upload."; exit 1
+          fi
+          # remove stray spaces/line breaks that sneak in when pasting secrets
+          trim() { printf '%s' "$1" | tr -d '\r\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'; }
+          FTP_SERVER=$(trim "$FTP_SERVER"); FTP_USERNAME=$(trim "$FTP_USERNAME")
+          export LFTP_PASSWORD=$(trim "$FTP_PASSWORD")
+          echo "Server: $FTP_SERVER (password is ${#LFTP_PASSWORD} characters)"
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp >/dev/null
+          lftp <<LFTP
+          set cmd:fail-exit yes
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate yes
+          set net:max-retries 2
+          open -p 21 -u "$FTP_USERNAME" --env-password "$FTP_SERVER"
+          cd public_html
+          pwd
+          mirror --reverse --verbose --no-perms site/ ./
+          bye
+          LFTP
+
+      - name: Check the live site after upload
+        run: |
+          sleep 5
+          for B in https://smilemilecare.com http://smilemilecare.com; do
+            c=$(curl -s -o /tmp/body -w '%{http_code}' "$B/" || true); echo "homepage $B: $c"
+            if [ "$c" = 200 ]; then break; fi
+          done
+          [ "$c" = 200 ] && grep -q "SmileMile" /tmp/body
+          c=$(curl -s -o /dev/null -w '%{http_code}' "$B/contact.php" || true); echo "contact form (GET is turned away): $c"; [ "$c" = 303 ]
+          c=$(curl -s -o /dev/null -w '%{http_code}' "$B/_private/leads.csv" || true); echo "saved messages (must be blocked): $c"; [ "$c" = 403 ] || [ "$c" = 404 ]
+          echo "https: $(curl -s -o /dev/null -w '%{http_code}' https://smilemilecare.com/ || echo none)"
+          echo "All checks passed."
