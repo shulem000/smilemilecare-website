@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>SmileMile Care — Email signature</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{--cream:#FBF7F1;--ink:#16302A;--muted:#6B7C76;--line:#E8DFD2;--coral:#E5734F;--coralD:#C95A37;--green:#1D4A40}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{width:min(760px,100% - 32px);margin:40px auto 60px}
+h1{font:600 1.7rem/1.2 Georgia,serif;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 26px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+label{display:grid;gap:4px;font-size:.85rem;font-weight:600;color:var(--muted)}
+input{font:inherit;font-size:1rem;padding:11px 13px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink)}
+input:focus{outline:0;border-color:var(--coral)}
+.card{background:#fff;border-radius:18px;padding:26px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px -14px rgba(22,48,42,.2)}
+.btn{margin-top:18px;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 24px;border:0;border-radius:999px;background:var(--coral);color:#fff;font:600 1rem system-ui,sans-serif;cursor:pointer}
+.btn:hover{background:var(--coralD)}
+.ok{margin-left:12px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s}
+.ok.show{opacity:1}
+ol{padding-left:20px;color:#3E5650}
+ol li{margin:6px 0}
+h2{font:600 1.15rem Georgia,serif;margin:34px 0 8px}
+@media (max-width:560px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Email signature</h1>
+  <p class="sub">Type your details, click Copy, then paste it into Gmail.</p>
+
+  <div class="grid">
+    <label>Name<input id="n" value="Shulem Schnitzler"></label>
+    <label>Title<input id="t" value="Co-Founder"></label>
+    <label>Email<input id="e" value="info@smilemilecare.com"></label>
+    <label>Phone (optional)<input id="p" value="" placeholder="e.g. 718-555-0100"></label>
+  </div>
+
+  <div class="card"><div id="sig"></div></div>
+  <button class="btn" id="copy" type="button">Copy signature</button><span class="ok" id="ok">Copied</span>
+
+  <h2>Put it in Gmail</h2>
+  <ol>
+    <li>In Gmail on a computer, click the gear, then <b>See all settings</b>.</li>
+    <li>On the <b>General</b> tab, scroll to <b>Signature</b> and click <b>Create new</b>. Give it a name, like SmileMile.</li>
+    <li>Click in the big box and paste (Ctrl+V, or Cmd+V on a Mac).</li>
+    <li>Under <b>Signature defaults</b>, pick your SmileMile address in the first dropdown, and choose the new signature for both <b>new emails</b> and <b>replies</b>.</li>
+    <li>Scroll to the bottom and click <b>Save Changes</b>.</li>
+  </ol>
+</div>
+
+<script>
+(function () {
+  var LOGO = 'https://smilemilecare.com/email/smilemile-signature-logo.png';
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function v(id) { return document.getElementById(id).value.trim(); }
+  function build() {
+    var n = v('n'), t = v('t'), e = v('e'), p = v('p');
+    var tel = p.replace(/[^\d+]/g, '');
+    var contact = [];
+    if (e) contact.push('<a href="mailto:' + esc(e) + '" style="color:#16302A;text-decoration:none">' + esc(e) + '</a>');
+    if (p) contact.push('<a href="tel:' + esc(tel) + '" style="color:#16302A;text-decoration:none">' + esc(p) + '</a>');
+    contact.push('<a href="https://smilemilecare.com" style="color:#C95A37;text-decoration:none">smilemilecare.com</a>');
+    return '<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;color:#16302A">' +
+      (n ? '<tr><td style="font-family:Georgia,\'Times New Roman\',serif;font-size:17px;font-weight:bold;line-height:22px;color:#16302A">' + esc(n) + '</td></tr>' : '') +
+      (t ? '<tr><td style="font-size:13px;line-height:19px;color:#6B7C76">' + esc(t) + '</td></tr>' : '') +
+      '<tr><td style="padding:10px 0 9px"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="width:44px;height:2px;background:#E5734F;font-size:0;line-height:0">&nbsp;</td></tr></table></td></tr>' +
+      '<tr><td style="padding:0 0 8px"><a href="https://smilemilecare.com" style="text-decoration:none"><img src="' + LOGO + '" width="180" height="32" alt="SmileMile Care" style="display:block;border:0;width:180px;height:32px"></a></td></tr>' +
+      '<tr><td style="font-size:13px;line-height:19px;color:#16302A">' + contact.join(' <span style="color:#E5734F">&nbsp;&middot;&nbsp;</span> ') + '</td></tr>' +
+      '<tr><td style="font-size:12px;line-height:18px;color:#6B7C76;font-style:italic;padding-top:2px">Healthy smiles, right where they live.</td></tr>' +
+      '</table>';
+  }
+  var sig = document.getElementById('sig');
+  function render() { sig.innerHTML = build(); }
+  ['n', 't', 'e', 'p'].forEach(function (id) { document.getElementById(id).addEventListener('input', render); });
+  render();
+
+  document.getElementById('copy').addEventListener('click', function () {
+    var html = build();
+    var done = function () { var ok = document.getElementById('ok'); ok.classList.add('show'); setTimeout(function () { ok.classList.remove('show'); }, 2000); };
+    var fallback = function () {
+      var r = document.createRange(); r.selectNodeContents(sig);
+      var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      s.removeAllRanges();
+    };
+    try {
+      if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+        navigator.clipboard.write([new ClipboardItem({
+          'text/html': new Blob([html], { type: 'text/html' }),
+          'text/plain': new Blob([sig.innerText], { type: 'text/plain' })
+        })]).then(done, fallback);
+      } else { fallback(); }
+    } catch (e) { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>
